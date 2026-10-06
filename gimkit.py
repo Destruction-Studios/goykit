@@ -5,6 +5,7 @@ import difflib
 import tkinter as tk
 import ctypes
 import json
+import sys
 from pathlib import Path
 from PIL import ImageOps
 from pynput import mouse
@@ -43,6 +44,7 @@ class Toast:
 toast = Toast()
 
 DB_FILE = Path(__file__).parent / "words.json"
+SETTINGS_FILE = Path(__file__).parent / "settings.json"
 
 def loadDb():
     if DB_FILE.exists():
@@ -51,6 +53,27 @@ def loadDb():
 
 def saveDb(db):
     DB_FILE.write_text(json.dumps(db, indent=2, ensure_ascii=False), encoding="utf-8")
+
+def loadSettings():
+    if not SETTINGS_FILE.exists():
+        return None
+    try:
+        data = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+        return {k: tuple(data[k]) for k in ("result_pt", "cont_pt", "word_region", "answer_region")}
+    except (json.JSONDecodeError, KeyError, TypeError):
+        print("settings.json is corrupted or incomplete, asking again")
+        return None
+
+def saveSettings(settings):
+    SETTINGS_FILE.write_text(json.dumps(settings, indent=2), encoding="utf-8")
+
+def askSettings():
+    return {
+        "result_pt": waitForClick("Click a spot that turns red/green to determine correct answer"),
+        "word_region": defineRegion("Latin Word"),
+        "answer_region": defineRegion("Answers"),
+        "cont_pt": waitForClick("Click where the continue button will be"),
+    }
 
 def findKey(word, db):
     if word in db:
@@ -192,12 +215,30 @@ def learnSol(word, key, db, region, result_pt):
         print("UNABLE TO DETERMINE IF CORRECT")
         toast.show("UNABLE TO DETERMINE IF CORRECT")
 
-
+def clickContinue(result_pt, cont_pt, timeout=8):
+    end = time.time() + timeout
+    while time.time() < end:
+        if getResult(result_pt) is None:
+            return True
+        pyautogui.click(cont_pt[0], cont_pt[1])
+        time.sleep(0.1)
+    return False
 
 def main():
-    result_pt = waitForClick("Click a spot that turns red/green to determine correct answer")
-    word_region = defineRegion("Latin Word")
-    answer_region = defineRegion("Answers")
+    settings = None if "--reset" in sys.argv else loadSettings()
+
+    if settings:
+        toast.show("Loaded saved settings")
+        print("Loaded settings.json")
+    else:
+        settings = askSettings()
+        saveSettings(settings)
+        print("Saved settings.json")
+
+    result_pt = settings["result_pt"]
+    cont_pt = settings["cont_pt"]
+    word_region = settings["word_region"]
+    answer_region = settings["answer_region"]
 
     print(f"\nWords:    {word_region}")
     print(f"\nAnswers:    {answer_region}")
@@ -217,10 +258,9 @@ def main():
         word = readLatin(word_region)
 
         if not word or word == last:
-            time.sleep(.2)
+            time.sleep(.1)
             continue
 
-        time.sleep(0.1)
         if readLatin(word_region) != word:
             continue
 
@@ -234,7 +274,15 @@ def main():
         else:
             learnSol(word, key or word, db, answer_region, result_pt)
         
-        time.sleep(.75)
+        rs = waitForResult(result_pt, 3)
+        if rs:
+            toast.show("continuing...")
+            if not clickContinue(result_pt, cont_pt):
+                toast.show("Continue didn't work, press it yourself", RED)
+        else:
+            toast.show("No result screen detected, not continuing", RED)
+        
+        time.sleep(.1)
             
 
 if __name__ == "__main__":
