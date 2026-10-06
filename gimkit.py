@@ -9,6 +9,9 @@ from pathlib import Path
 from PIL import ImageOps
 from pynput import mouse
 
+MATCH_THRESHOLD = 0.6
+ORANGE, GREEN, RED = "#e08a00", "#2e9e5b", "#c0392b"
+
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 class Toast:
@@ -123,17 +126,41 @@ def attemptToAnswer(entry, region):
     if best_idx is not None and best_score >= MATCH_THRESHOLD:
         pyautogui.click(*cellCenter(best_idx, region))
         print(f"{entry['latin']} -> {target} (MATCH {best_score:.3f})")
-        return true
+        return True
     
     print(f"Couldnt find '{target}' on screen (best {best_score:.3f})")
     toast.show(f"Couldn't find '{target}', click the right one", RED)
     return False
 
-def learnSol(word, key, db, region):
+def classifyColor(r,g,b):
+    if g>r+40 and g > b + 40:
+        return "yes"
+    if r > g+40 and r > b+40:
+        return "no"
+    return None
+
+def getResult(pt):
+    x,y=int(pt[0]), int(pt[1])
+    img=pyautogui.screenshot(region=(x-2, y-2, 5, 5)).convert("RGB")
+    r,g,b = img.resize((1, 1)).getpixel((0, 0))
+    return classifyColor(r,g,b)
+
+def waitForResult(pt,timeout=4):
+    end = time.time() + timeout
+    while time.time() < end:
+        res = getResult(pt)
+        if res:
+            return res
+        time.sleep(.05)
+    return None
+
+def learnSol(word, key, db, region, result_pt):
     ss = pyautogui.screenshot(region=region)
     cells = getCells(ss)
 
     x,y=waitForClick(f"Adding dict entry '{word}': click correct answer")
+
+    
 
     left,top,w,h = region
 
@@ -148,12 +175,27 @@ def learnSol(word, key, db, region):
 
     if not eng:
         toast.show("can not read answer", RED)
+        return
     
-    db[key] = {"latin":word, "english":eng}
-    saveDb(db)
-    print(f"SAVED {word} -> {eng}")
+    time.sleep(.15)
+    result = waitForResult(result_pt)
+
+    if result == "yes": 
+        db[key] = {"latin":word, "english":eng}
+        saveDb(db)
+        toast.show(f"Saved {word} -> {eng}")
+        print(f"SAVED {word} -> {eng}")
+    elif result == "no":
+        print(f"Wrong not saving: {word} -> {eng}")
+        toast.show("Wrong, not saving", RED)
+    else:
+        print("UNABLE TO DETERMINE IF CORRECT")
+        toast.show("UNABLE TO DETERMINE IF CORRECT")
+
+
 
 def main():
+    result_pt = waitForClick("Click a spot that turns red/green to determine correct answer")
     word_region = defineRegion("Latin Word")
     answer_region = defineRegion("Answers")
 
@@ -167,11 +209,10 @@ def main():
         6
     )
 
-    # print("\n Watching for words... (CTRL+C TO STOP)\n")
+    print("\n Watching for words... (CTRL+C TO STOP)\n")
     last = None
     while True:
         toast.tick()
-
 
         word = readLatin(word_region)
 
@@ -179,6 +220,7 @@ def main():
             time.sleep(.2)
             continue
 
+        time.sleep(0.1)
         if readLatin(word_region) != word:
             continue
 
@@ -190,13 +232,10 @@ def main():
         if key and attemptToAnswer(db[key], answer_region):
             pass
         else:
-            learnSol(word, key or word, db, answer_region)
+            learnSol(word, key or word, db, answer_region, result_pt)
         
         time.sleep(.75)
             
-    
-
-
 
 if __name__ == "__main__":
     main()
