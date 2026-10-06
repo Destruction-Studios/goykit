@@ -1,0 +1,134 @@
+{
+  "olim: adv:": {
+    "latin": "olim: adv:",
+    "english": "once"
+  },
+  "nüper: adv:": {
+    "latin": "nüper: adv:",
+    "english": "recently"
+  },
+  "creo, creare, creavi, creatum": {
+    "latin": "creo, creare, creavi, creatum",
+    "english": "to create"
+  },
+  "ante: prep * acc": {
+    "latin": "ante: prep * acc",
+    "english": "before"
+  },
+  "pater, patris, m.": {
+    "latin": "pater, patris, m.",
+    "english": "father"
+  },
+  "factum, facti, n:": {
+    "latin": "factum, facti, n:",
+    "english": "deed, action"
+  },
+  "sto, stare, steti, statum": {
+    "latin": "sto, stare, steti, statum",
+    "english": "to stand"
+  },
+  "pro: prep. -* abl.:": {
+    "latin": "pro: prep. -* abl.:",
+    "english": "instead of, in front of"
+  },
+  "alo, alere, alui, altum": {
+    "latin": "alo, alere, alui, altum",
+    "english": "to nourish, support"
+  },
+  "suus, sua, suum": {
+    "latin": "suus, sua, suum",
+    "english": "his own, her own, its own"
+  },
+  "asia, -ae, f.": {
+    "latin": "asia, -ae, f.",
+    "english": "asia minor"
+  },
+  "ante: adv:": {
+    "latin": "ante: adv:",
+    "english": "before, previously"
+  },
+  "doctus, docta, doctum": {
+    "latin": "doctus, docta, doctum",
+    "english": "learned, skilled"
+  },
+  "mater, matris, f.": {
+    "latin": "mater, matris, f.",
+    "english": "mother"
+  },
+  "divitiae, divitiarum, f. pl:": {
+    "latin": "divitiae, divitiarum, f. pl:",
+    "english": "riches, wealth"
+  },
+  "annus, -1, m.": {
+    "latin": "annus, -1, m.",
+    "english": "year"
+  },
+  "fortünatus, fortünata, fortüunatum": {
+    "latin": "fortünatus, fortünata, fortüunatum",
+    "english": "lucky, happy"
+  },
+  "patientia, -ae, f.": {
+    "latin": "patientia, -ae, f.",
+    "english": "patience, suffering"
+  },
+  "diü: adv:": {
+    "latin": "diü: adv:",
+    "english": "for along time"
+  },
+  "diligo, diligere, dilexi, dilectum": {
+    "latin": "diligo, diligere, dilexi, dilectum",
+    "english": "to esteem, love"
+  },
+  "adulescens, adulescentis, m/f": {
+    "latin": "adulescens, adulescentis, m/f",
+    "english": "young man, young woman"
+  },
+  "cado, cadere, cecidi, casüurum": {
+    "latin": "cado, cadere, cecidi, casüurum",
+    "english": "to fall"
+  },
+  "principium, -ii, n.": {
+    "latin": "principium, -ii, n.",
+    "english": "beginning"
+  },
+  "quisque, quidque": {
+    "latin": "quisque, quidque",
+    "english": "each one, each person"
+  },
+  "signum, signi, n:": {
+    "latin": "signum, signi, n:",
+    "english": "sign"
+  },
+  "caesar, caesaris, m.": {
+    "latin": "caesar, caesaris, m.",
+    "english": "caesar"
+  },
+  "acerbus, -a, -um": {
+    "latin": "acerbus, -a, -um",
+    "english": "harsh, bitter"
+  },
+  "nam": {
+    "latin": "nam",
+    "english": "for"
+  },
+  "lungo, lungere, lünxi, lunctum": {
+    "latin": "lungo, lungere, lünxi, lunctum",
+    "english": "to join"
+  },
+  "sui": {
+    "latin": "sui",
+    "english": "himself, herself, itself"
+  },
+  "per: prep * acc": {
+    "latin": "per: prep * acc",
+    "english": "through"
+  },
+  "amitto, amittere, amisi, amissum": {
+    "latin": "amitto, amittere, amisi, amissum",
+    "english": "to lose, let go"
+  },
+  "ipse, lpsa, ipsum": {
+    "latin": "ipse, lpsa, ipsum",
+    "english": "the very, the actual"
+  }
+}

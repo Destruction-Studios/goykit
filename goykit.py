@@ -115,20 +115,34 @@ def getCells(img):
     
     return cells
 
-def readText(src, lang="eng", psm=7, threshold=False):
+def readText(src, lang="eng", psm=7, threshold=False, scale=2):
     img = pyautogui.screenshot(region=src) if isinstance(src, tuple) else src
     img = ImageOps.grayscale(img)
-    img = img.resize((img.width*2, img.height*2))
+    img = img.resize((img.width*scale, img.height*scale))
     if threshold:
         img = img.point(lambda p: 255 if p > 140 else 0)
 
     return pytesseract.image_to_string(img, config=f"--psm {psm}", lang=lang).strip().lower()
 
+def cropToText(img, pad=10):
+    bbox=ImageOps.invert(img).getbbox()
+    if bbox is None:
+        return None
+    return ImageOps.expand(img.crop(bbox), border=pad, fill=255)
+
 def readLatin(reg):
     return readText(reg, lang="lat", psm=7, threshold=True)
 
 def readCell(img):
-    return readText(img, lang="eng", psm=6, threshold=False)
+    img = ImageOps.grayscale(img)
+    img = img.point(lambda p: 0 if p > 200 else 255)
+    img = cropToText(img)
+
+    if img is None:
+        return ""
+
+    text = readText(img, lang="eng", psm=6, scale=3)
+    return " ".join(text.split())
 
 def cellCenter(idx, region):
     left, top, w, h = region
@@ -174,7 +188,7 @@ def waitForResult(pt,timeout=4):
         res = getResult(pt)
         if res:
             return res
-        time.sleep(.05)
+        time.sleep(.01)
     return None
 
 def learnSol(word, key, db, region, result_pt):
@@ -182,8 +196,6 @@ def learnSol(word, key, db, region, result_pt):
     cells = getCells(ss)
 
     x,y=waitForClick(f"Adding dict entry '{word}': click correct answer")
-
-    
 
     left,top,w,h = region
 
@@ -200,7 +212,7 @@ def learnSol(word, key, db, region, result_pt):
         toast.show("can not read answer", RED)
         return
     
-    time.sleep(.15)
+    time.sleep(.1)
     result = waitForResult(result_pt)
 
     if result == "yes": 
@@ -221,7 +233,7 @@ def clickContinue(result_pt, cont_pt, timeout=8):
         if getResult(result_pt) is None:
             return True
         pyautogui.click(cont_pt[0], cont_pt[1])
-        time.sleep(0.1)
+        time.sleep(0.03)
     return False
 
 def main():
@@ -258,7 +270,7 @@ def main():
         word = readLatin(word_region)
 
         if not word or word == last:
-            time.sleep(.1)
+            time.sleep(.03)
             continue
 
         if readLatin(word_region) != word:
@@ -282,7 +294,7 @@ def main():
         else:
             toast.show("No result screen detected, not continuing", RED)
         
-        time.sleep(.1)
+        time.sleep(.03)
             
 
 if __name__ == "__main__":
